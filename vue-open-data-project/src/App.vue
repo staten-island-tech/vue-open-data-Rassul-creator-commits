@@ -1,5 +1,3 @@
-<script setup></script>
-
 <template>
   <h1>You did it!</h1>
   <p>
@@ -7,6 +5,16 @@
     documentation
   </p>
 </template>
-fetch (https://data.cityofnewyork.us/api/v3/views/jb7j-dtam/query.json)
+<script setup>
+import { createRouter } from 'vue'
 
+const router = createRouter({
+  routes: [
+    { path: '/', component: HomeView },
+    { path: '/PokemonData/:id', component: PokemonData },
+  ],
+})
+</script>
+
+// fetch (https://data.cityofnewyork.us/api/v3/views/jb7j-dtam/query.json)
 <style scoped></style>
