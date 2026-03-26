@@ -7,7 +7,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 
-import DeathCard from '../components/DeathCard.vue'
+import DeathCard from './components/DeathCard.vue'
 const death = ref([])
 async function getDeathRate() {
   try {
