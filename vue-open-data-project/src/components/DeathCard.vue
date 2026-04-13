@@ -1,7 +1,12 @@
 <template>
-  <div></div>
+  <div> </div>
 </template>
 
-<script setup></script>
+<script setup>
+  import {death.value} from '../HomeView.vue'
+  
+</script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+
+</style>
