@@ -1,13 +1,14 @@
 <template>
     <div class="container">
-      <div v-for =""></div>
+      <DeathCard v-for="item in death" :death="item" />
     </div>
   </template>
   
   <script setup>
   import { ref, onMounted } from 'vue'
+  import DeathCard from '../components/DeathCard.vue'
   
-  const death = ref([])
+  const death = ref({})
   async function getDeathRate() {
     try {
       const response = await fetch('https://data.cityofnewyork.us/resource/jb7j-dtam.json')
