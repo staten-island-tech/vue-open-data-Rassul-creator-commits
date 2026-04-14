@@ -4,12 +4,12 @@
   </div>
   <div> 
     <div class="card">
-    <p><strong>Year:</strong> {{ death.year }}</p>
-    <p><strong>Leading Cause:</strong> {{ death.leading_cause }}</p>
-    <p><strong>Sex:</strong> {{ death.sex }}</p>
-    <p><strong>Race:</strong> {{ death.race_ethnicity }}</p>
-    <p><strong>Deaths:</strong> {{ death.deaths }}</p>
-    <p><strong>Rate:</strong> {{ death.death_rate }}</p>
+    <p>Year: {{ death.year }}</p>
+    <p>Leading Cause: {{ death.leading_cause }}</p>
+    <p>Sex: {{ death.sex }}</p>
+    <p>Race: {{ death.race_ethnicity }}</p>
+    <p>Deaths: {{ death.deaths }}</p>
+    <p>Rate: {{ death.death_rate }}</p>
   </div>
   </div>
 
@@ -21,12 +21,12 @@
   death: Object
   })
 
-
-
-
-
 </script>
 
-<style lang="scss" scoped>
-
+<style scoped>
+  .card {
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin: 10px 0;
+}
 </style>

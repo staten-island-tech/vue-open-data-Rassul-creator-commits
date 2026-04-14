@@ -3,9 +3,10 @@
     <h1>NYC Death Data</h1>
 
     <input v-model="searchYear" placeholder="Enter year..." />
-    <button @click="filterData">Search</button>
 
-    <canvas ref="chartRef"></canvas>
+    <canvas ref="causeChart"></canvas>
+
+    <canvas ref="raceChart"></canvas>
 
     <DeathCard
       v-for="(item, index) in filteredDeaths"
@@ -16,74 +17,112 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import DeathCard from '../components/DeathCard.vue'
 import Chart from 'chart.js/auto'
 
 const deaths = ref([])
 const searchYear = ref('')
-const chartRef = ref(null)
 
-async function getDeathRate() {
+const causeChart = ref(null)
+const raceChart = ref(null)
+
+let chart1 = null
+let chart2 = null
+
+async function loadData() {
   try {
-    const response = await fetch('https://data.cityofnewyork.us/resource/jb7j-dtam.json')
+    const res = await fetch(
+      'https://data.cityofnewyork.us/resource/jb7j-dtam.json'
+    )
 
-    if (!response.ok) {
-      throw new Error('Failed to fetch data')
-    }
+    deaths.value = await res.json()
 
-    const data = await response.json()
-    deaths.value = data
-
-    createChart()
-  } catch (error) {
-    alert(error.message)
+    drawCharts()
+  } catch (err) {
+    alert('Failed to load data')
+    console.log(err)
   }
 }
 
 const filteredDeaths = computed(() => {
-  if (searchYear.value === '') {
-    return deaths.value
-  }
-  return deaths.value.filter(d => d.year.includes(searchYear.value))
+  if (!searchYear.value) return deaths.value
+
+  return deaths.value.filter(d =>
+    d.year && d.year.toString().includes(searchYear.value)
+  )
 })
 
-function filterData() {
-  if (searchYear.value === '') {
-    alert('Enter a year')
+function drawCharts() {
+  const data = filteredDeaths.value
+
+  if (!data.length) return
+
+  if (causeChart.value) {
+    const ctx = causeChart.value.getContext('2d')
+
+    if (chart1) chart1.destroy()
+
+    const top = data.slice(0, 5)
+
+    chart1 = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: top.map(d => d.leading_cause),
+        datasets: [
+          {
+            label: 'Deaths by Cause',
+            data: top.map(d => Number(d.deaths))
+          }
+        ]
+      }
+    })
+  }
+
+  if (raceChart.value) {
+    const ctx = raceChart.value.getContext('2d')
+
+    if (chart2) chart2.destroy()
+
+    const groups = {}
+
+    data.forEach(d => {
+      const race = d.race_ethnicity || 'Unknown'
+
+      if (!groups[race]) {
+        groups[race] = 0
+      }
+
+      groups[race] += Number(d.deaths)
+    })
+
+    chart2 = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: Object.keys(groups).slice(0, 5),
+        datasets: [
+          {
+            label: 'Deaths by Race',
+            data: Object.values(groups).slice(0, 5)
+          }
+        ]
+      }
+    })
   }
 }
 
-function createChart() {
-  if (!chartRef.value) return
-
-  const ctx = chartRef.value.getContext('2d')
-
-  const labels = deaths.value.slice(0, 5).map(d => d.leading_cause)
-  const values = deaths.value.slice(0, 5).map(d => d.deaths)
-
-  new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: labels,
-      datasets: [
-        {
-          label: 'Deaths',
-          data: values
-        }
-      ]
-    }
-  })
-}
+watch(searchYear, () => {
+  drawCharts()
+})
 
 onMounted(() => {
-  getDeathRate()
+  loadData()
 })
 </script>
 
 <style scoped>
 .container {
   width: 80vw;
-  margin: 30px auto;
+  margin: 20px auto;
 }
 </style>
